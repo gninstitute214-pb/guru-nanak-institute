@@ -64,3 +64,7 @@ npm run dev
 - **URL**: `http://localhost:5173/admin/login`
 - **Email**: `admin@institute.com`
 - **Password**: `admin123`
+
+
+## 🌐 Live Vercel Deployment
+- Connected to Vercel production pipeline.
