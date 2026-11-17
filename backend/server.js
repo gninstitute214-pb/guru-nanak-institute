@@ -30,7 +30,7 @@ app.use('/api/stats', statRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    institute: process.env.INSTITUTE_NAME || 'Apex Computer Institute',
+    institute: process.env.INSTITUTE_NAME || 'Guru Nanak Institute of Computer Education',
     time: new Date().toISOString()
   });
 });
@@ -44,9 +44,15 @@ const startServer = async () => {
     console.log(`===============================================`);
     console.log(`🚀 Institute Backend API running on port ${PORT}`);
     console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-    console.log(`🎓 Admin login: ${process.env.ADMIN_EMAIL || 'admin@institute.com'} / ${process.env.ADMIN_PASSWORD || 'admin123'}`);
+    console.log(`🎓 Admin login: ${process.env.ADMIN_EMAIL || 'gninstitute214@gmail.com'} / ${process.env.ADMIN_PASSWORD || 'admin123'}`);
     console.log(`===============================================`);
   });
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+} else {
+  connectDB();
+}
+
+module.exports = app;

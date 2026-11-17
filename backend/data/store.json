@@ -245,6 +245,16 @@
   ],
   "inquiries": [
     {
+      "name": "Public Visitor",
+      "phone": "7355687717",
+      "email": "",
+      "courseInterested": "General Inquiry",
+      "message": "Hello from public link",
+      "id": "inq_1794917671428",
+      "status": "New",
+      "createdAt": "2026-11-17T12:14:31.430Z"
+    },
+    {
       "name": "Amritpal Singh",
       "phone": "9876543210",
       "email": "amritpal@test.com",
