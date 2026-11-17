@@ -145,6 +145,14 @@ export const api = {
     });
     return await res.json();
   },
+  async resetWithPhone(phone, newPassword) {
+    const res = await fetch(`${API_BASE}/auth/reset-with-phone`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, newPassword })
+    });
+    return await res.json();
+  },
   async changePassword(currentPassword, newPassword) {
     const res = await fetch(`${API_BASE}/auth/change-password`, {
       method: 'POST',

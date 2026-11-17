@@ -119,12 +119,14 @@ This code is valid for 10 minutes. Do not share this code with anyone.
           </div>
         `
       });
+      return { success: true, liveEmailSent: true };
     } catch (err) {
       console.warn(`[Email Service Notice] Could not send OTP via SMTP: ${err.message}`);
+      return { success: true, liveEmailSent: false, error: err.message };
     }
   }
 
-  return true;
+  return { success: true, liveEmailSent: false, reason: 'SMTP not configured' };
 };
 
 module.exports = { sendInquiryEmail, sendOtpEmail };

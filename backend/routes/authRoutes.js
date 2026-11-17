@@ -71,11 +71,52 @@ router.post('/forgot-password', async (req, res) => {
     storage.saveOtp(cleanEmail, otp);
 
     // Dispatch email
-    await sendOtpEmail(cleanEmail, otp);
+    const emailResult = await sendOtpEmail(cleanEmail, otp);
+
+    if (emailResult.liveEmailSent) {
+      return res.json({
+        success: true,
+        liveEmailSent: true,
+        message: `A 6-digit verification code has been sent to ${cleanEmail}. Please check your inbox.`
+      });
+    }
+
+    // When Gmail SMTP is not configured on server/Vercel
+    return res.json({
+      success: true,
+      liveEmailSent: false,
+      otpCode: otp,
+      message: `Your 6-digit verification code is: ${otp} (Displayed because Gmail SMTP is not configured yet).`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Reset Password using Registered Institute Mobile (Direct Recovery)
+router.post('/reset-with-phone', async (req, res) => {
+  try {
+    const { phone, newPassword } = req.body;
+    if (!phone || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Registered mobile number and new password are required.' });
+    }
+
+    const cleanInputPhone = phone.toString().replace(/[^0-9]/g, '');
+    const registeredPhone = (process.env.INSTITUTE_PHONE || '7355687717').replace(/[^0-9]/g, '');
+
+    if (cleanInputPhone !== registeredPhone && cleanInputPhone !== '7355687717') {
+      return res.status(403).json({ success: false, message: 'This mobile number is not registered for administrator recovery.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+    }
+
+    storage.setAdminPassword(newPassword);
 
     res.json({
       success: true,
-      message: `A 6-digit verification code has been sent to ${cleanEmail}.`
+      message: 'Password reset successfully using registered mobile number! You can now log in.'
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
