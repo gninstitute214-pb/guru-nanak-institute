@@ -1,0 +1,14 @@
+{
+  "name": "institute-website-mern",
+  "version": "1.0.0",
+  "description": "Full MERN Stack Web Application for Computer Education Institute",
+  "scripts": {
+    "start": "node backend/server.js",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": ["mern", "institute", "react", "nodejs", "express", "mongodb"],
+  "author": "Antigravity",
+  "license": "ISC"
+}
