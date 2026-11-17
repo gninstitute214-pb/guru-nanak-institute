@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { 
   Users, BookOpen, Award, MessageSquare, Plus, Trash2, Edit3, X,
-  CheckCircle2, XCircle, Clock, Search, RefreshCw, LogOut, ShieldCheck, Save
+  CheckCircle2, XCircle, Clock, Search, RefreshCw, LogOut, ShieldCheck, Save, Lock
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -59,6 +59,47 @@ export default function AdminDashboard() {
   });
 
   const [feedbackMsg, setFeedbackMsg] = useState({ text: '', type: '' });
+
+  // Change Password Modal State
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passError, setPassError] = useState('');
+  const [passSuccess, setPassSuccess] = useState('');
+  const [passLoading, setPassLoading] = useState(false);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPassError('');
+    setPassSuccess('');
+
+    if (passForm.newPassword !== passForm.confirmPassword) {
+      setPassError('New passwords do not match.');
+      return;
+    }
+    if (passForm.newPassword.length < 6) {
+      setPassError('New password must be at least 6 characters.');
+      return;
+    }
+
+    setPassLoading(true);
+    try {
+      const res = await api.changePassword(passForm.currentPassword, passForm.newPassword);
+      if (res.success) {
+        setPassSuccess(res.message);
+        setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setTimeout(() => {
+          setShowPasswordModal(false);
+          setPassSuccess('');
+        }, 2000);
+      } else {
+        setPassError(res.message || 'Failed to change password.');
+      }
+    } catch {
+      setPassError('Network error. Please try again.');
+    } finally {
+      setPassLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -259,6 +300,13 @@ export default function AdminDashboard() {
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Refresh</span>
+          </button>
+          <button
+            onClick={() => { setShowPasswordModal(true); setPassError(''); setPassSuccess(''); }}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold transition-colors"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Change Password</span>
           </button>
           <button
             onClick={logout}
@@ -981,6 +1029,98 @@ export default function AdminDashboard() {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      )}
+
+      {/* CHANGE PASSWORD MODAL */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 animate-fadeIn">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-indigo-600" />
+                  <span>Change Admin Password</span>
+                </h3>
+                <p className="text-xs text-slate-500">Update your security password</p>
+              </div>
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {passSuccess && (
+              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-xs text-emerald-800">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{passSuccess}</span>
+              </div>
+            )}
+
+            {passError && (
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-xs text-rose-700">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{passError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Current Password *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter current password"
+                  value={passForm.currentPassword}
+                  onChange={(e) => setPassForm({ ...passForm, currentPassword: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">New Password (Min 6 characters) *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter new password"
+                  value={passForm.newPassword}
+                  onChange={(e) => setPassForm({ ...passForm, newPassword: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Confirm New Password *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Confirm new password"
+                  value={passForm.confirmPassword}
+                  onChange={(e) => setPassForm({ ...passForm, confirmPassword: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-xl font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={passLoading}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-md disabled:opacity-50"
+                >
+                  {passLoading ? 'Updating...' : 'Update Password (ਪਾਸਵਰਡ ਬਦਲੋ)'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

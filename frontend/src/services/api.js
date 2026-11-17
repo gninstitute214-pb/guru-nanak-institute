@@ -129,6 +129,30 @@ export const api = {
     });
     return await res.json();
   },
+  async forgotPassword(email) {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    return await res.json();
+  },
+  async resetPassword(email, otp, newPassword) {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp, newPassword })
+    });
+    return await res.json();
+  },
+  async changePassword(currentPassword, newPassword) {
+    const res = await fetch(`${API_BASE}/auth/change-password`, {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    return await res.json();
+  },
   async getMe() {
     const res = await fetch(`${API_BASE}/auth/me`, {
       headers: getHeaders(true)

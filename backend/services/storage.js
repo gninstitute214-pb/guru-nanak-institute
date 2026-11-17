@@ -245,4 +245,47 @@ const storage = {
   }
 };
 
-module.exports = storage;
+// Admin Password Management
+const getAdminPassword = () => {
+  const store = readStore();
+  return store.adminPassword || process.env.ADMIN_PASSWORD || 'Suman@1911';
+};
+
+const setAdminPassword = (newPassword) => {
+  const store = readStore();
+  store.adminPassword = newPassword;
+  writeStore(store);
+  return true;
+};
+
+// OTP store in memory for forgot password
+const otpStore = new Map(); // email -> { otp, expiresAt }
+
+const saveOtp = (email, otp) => {
+  otpStore.set(email.toLowerCase(), {
+    otp: otp.toString(),
+    expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+  });
+};
+
+const verifyOtp = (email, inputOtp) => {
+  const record = otpStore.get(email.toLowerCase());
+  if (!record) return false;
+  if (Date.now() > record.expiresAt) {
+    otpStore.delete(email.toLowerCase());
+    return false;
+  }
+  if (record.otp === inputOtp.toString().trim()) {
+    otpStore.delete(email.toLowerCase());
+    return true;
+  }
+  return false;
+};
+
+module.exports = {
+  ...storage,
+  getAdminPassword,
+  setAdminPassword,
+  saveOtp,
+  verifyOtp
+};

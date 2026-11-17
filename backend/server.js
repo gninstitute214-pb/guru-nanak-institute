@@ -44,7 +44,7 @@ const startServer = async () => {
     console.log(`===============================================`);
     console.log(`🚀 Institute Backend API running on port ${PORT}`);
     console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-    console.log(`🎓 Admin login: ${process.env.ADMIN_EMAIL || 'gninstitute214@gmail.com'} / ${process.env.ADMIN_PASSWORD || 'admin123'}`);
+    console.log(`🎓 Admin login: ${process.env.ADMIN_EMAIL || 'gninstitute214@gmail.com'} / ${process.env.ADMIN_PASSWORD || 'Suman@1911'}`);
     console.log(`===============================================`);
   });
 };
